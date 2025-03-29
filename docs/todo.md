@@ -51,23 +51,23 @@ This checklist breaks down the project into thorough, incremental tasks. Check o
 ---
 
 ## 4. File Scanner Module
-- [ ] **Recursive File Scanning**
-  - [ ] Implement functionality to scan the target folder recursively.
-  - [ ] Filter to only process files with the `.md` extension.
-- [ ] **Directory Exclusion**
-  - [ ] Exclude directories as specified in the configuration.
-- [ ] **Pre-checks Implementation**
-  - [ ] **Empty File Check:** 
-    - [ ] Read file content, trim whitespace, and flag as empty if no content remains.
-  - [ ] **Frontmatter-only Check:**
-    - [ ] Detect if a file starts with `---` and ends with `---` with no additional content.
-- [ ] **Exclusion File Parsing**
-  - [ ] Parse `quality_exclude_links.md` to extract Obsidian links (e.g., `[[link-to-page]]`).
-  - [ ] Skip files that appear in the exclusion list.
-- [ ] **Unit Tests for Scanner**
-  - [ ] Write tests for file scanning.
-  - [ ] Test pre-checks for empty and frontmatter-only files.
-  - [ ] Validate exclusion file parsing and matching.
+- [x] **Recursive File Scanning**
+  - [x] Implement functionality to scan the target folder recursively.
+  - [x] Filter to only process files with the `.md` extension.
+- [x] **Directory Exclusion**
+  - [x] Exclude directories as specified in the configuration.
+- [x] **Pre-checks Implementation**
+  - [x] **Empty File Check:** 
+    - [x] Read file content, trim whitespace, and flag as empty if no content remains.
+  - [x] **Frontmatter-only Check:**
+    - [x] Detect if a file starts with `---` and ends with `---` with no additional content.
+- [x] **Exclusion File Parsing**
+  - [x] Parse `quality_exclude_links.md` to extract Obsidian links (e.g., `[[link-to-page]]`).
+  - [x] Skip files that appear in the exclusion list.
+- [x] **Unit Tests for Scanner**
+  - [x] Write tests for file scanning.
+  - [x] Test pre-checks for empty and frontmatter-only files.
+  - [x] Validate exclusion file parsing and matching.
 
 ---
 
