@@ -72,14 +72,14 @@ This checklist breaks down the project into thorough, incremental tasks. Check o
 ---
 
 ## 5. Classification Module
-- [ ] **Integrate with GenAI Engine**
-  - [ ] Create a function to send file content and the classification prompt to the GenAI engine.
-  - [ ] Simulate interaction with LangChainGo for now.
-- [ ] **Response Handling**
-  - [ ] Parse responses to classify files as "Empty", "Low quality/low effort", or "Good enough".
-- [ ] **Unit Tests for Classification**
-  - [ ] Use mocks to simulate various GenAI engine responses.
-  - [ ] Verify that the function correctly interprets and returns classifications.
+- [x] **Integrate with GenAI Engine**
+  - [x] Create a function to send file content and the classification prompt to the GenAI engine.
+  - [x] Integrate with LangChainGo to connect to Ollama.
+- [x] **Response Handling**
+  - [x] Parse responses to classify files as "Empty", "Low quality/low effort", or "Good enough".
+- [x] **Unit Tests for Classification**
+  - [x] Use mocks to simulate various GenAI engine responses.
+  - [x] Verify that the function correctly interprets and returns classifications.
 
 ---
 
