@@ -123,7 +123,7 @@ Develop the configuration module in the `config` package. Define a configuration
 
 Use Viper to load this YAML configuration from a file. Include error handling for missing or invalid configuration files. Also, add unit tests that verify configuration loading, defaults being applied, and proper error reporting. End the prompt by wiring this configuration module so that it can be imported by other modules.
 
-Refer to todo.md and make sure thiss step has been validated.
+Refer to todo.md and make sure thiss step has been validated and update it  doc as the final step.
 ```
 
 ---
@@ -132,6 +132,8 @@ Refer to todo.md and make sure thiss step has been validated.
 
 ```text
 Create the CLI module in the `cli` package using Cobra. Implement a root command that accepts a target folder as an argument or flag. In the command's run function, load the configuration using the configuration module from the previous step. Ensure proper error handling if the configuration fails to load. Write tests for the CLI module to verify that command-line arguments are parsed correctly and that the configuration is loaded. End the prompt with a call to the configuration module to ensure integration.
+
+Refer to todo.md and make sure thiss step has been validated and update it  doc as the final step.
 ```
 
 ---
@@ -148,6 +150,8 @@ Develop the file scanner module in the `scanner` package. This module should:
 4. Parse an exclusion file (`quality_exclude_links.md`) to extract Obsidian links (formatted as `[[link-to-page]]`) and skip files that are already flagged.
 
 Include unit tests for each of these functionalities. End the prompt by ensuring that the scanner module outputs a list of file objects along with their pre-check statuses, ready for further processing.
+
+Refer to todo.md and make sure thiss step has been validated and update it  doc as the final step.
 ```
 
 ---
@@ -161,6 +165,8 @@ Implement the classification module in the `classification` package. This module
 3. Parse and return the classification result.
 
 Write unit tests that simulate different responses from the GenAI engine using mocking. End the prompt with the module exposing a function that can be called from the main workflow.
+
+Refer to todo.md and make sure thiss step has been validated and update it  doc as the final step.
 ```
 
 ---
@@ -178,6 +184,8 @@ Create the output module in the `output` package. This module should:
 4. Write the report to a markdown file in the root of the target folder.
 
 Include unit tests to verify the formatting and content of the report. End the prompt by ensuring that the output module integrates with the rest of the project.
+
+Refer to todo.md and make sure thiss step has been validated and update it  doc as the final step.
 ```
 
 ---
@@ -197,6 +205,8 @@ Wire together all the modules in `main.go` to create a fully integrated CLI appl
 6. Ensure that all errors are properly logged and that the process is testable end-to-end.
 
 Write integration tests that simulate a run on a temporary folder structure with sample Markdown files covering all edge cases. End the prompt with a summary of the integration and ensure that there is no orphaned code.
+
+Refer to todo.md and make sure thiss step has been validated and update it  doc as the final step.
 ```
 
 ---

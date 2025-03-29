@@ -21,32 +21,32 @@ This checklist breaks down the project into thorough, incremental tasks. Check o
 ---
 
 ## 2. Configuration Module
-- [ ] **Define Configuration Struct**
-  - [ ] Create a struct to hold:
+- [x] **Define Configuration Struct**
+  - [x] Create a struct to hold:
     - `ai_engine` (with `url` defaulting to `"http://localhost:11434/"` and `model` defaulting to `"gemma:12b"`)
     - `scan_settings` (with `file_extension` set to `.md` and a list of `exclude_directories`)
     - `prompt_config` (containing `quality_classification_prompt`)
     - `exclusion_file` (with `path` for `quality_exclude_links.md`)
-- [ ] **Implement Viper Loading**
-  - [ ] Use Viper to read the YAML configuration file.
-  - [ ] Apply default values where necessary.
-  - [ ] Add error handling for missing/invalid configuration.
-- [ ] **Unit Tests for Configuration**
-  - [ ] Write tests to verify proper loading of configuration.
-  - [ ] Test that defaults are correctly applied.
-  - [ ] Verify error messages when configuration is missing or invalid.
+- [x] **Implement Viper Loading**
+  - [x] Use Viper to read the YAML configuration file.
+  - [x] Apply default values where necessary.
+  - [x] Add error handling for missing/invalid configuration.
+- [x] **Unit Tests for Configuration**
+  - [x] Write tests to verify proper loading of configuration.
+  - [x] Test that defaults are correctly applied.
+  - [x] Verify error messages when configuration is missing or invalid.
 
 ---
 
 ## 3. CLI Module with Cobra
-- [ ] **Set Up Cobra Command**
-  - [ ] Create a root command that accepts a target folder as an argument or flag.
-  - [ ] Integrate configuration loading within the command execution.
-- [ ] **Error Handling**
-  - [ ] Ensure that errors in configuration loading are caught and logged.
-- [ ] **Unit Tests for CLI**
-  - [ ] Write tests to verify command-line argument parsing.
-  - [ ] Test that the configuration is loaded when the CLI command is executed.
+- [x] **Set Up Cobra Command**
+  - [x] Create a root command that accepts a target folder as an argument or flag.
+  - [x] Integrate configuration loading within the command execution.
+- [x] **Error Handling**
+  - [x] Ensure that errors in configuration loading are caught and logged.
+- [x] **Unit Tests for CLI**
+  - [x] Write tests to verify command-line argument parsing.
+  - [x] Test that the configuration is loaded when the CLI command is executed.
 
 ---
 

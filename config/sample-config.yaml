@@ -1,0 +1,35 @@
+# Sample configuration for RateMyKB
+
+# AI Engine configuration
+ai_engine:
+  # URL of the AI API endpoint
+  url: "http://localhost:11434/"
+  # Model to use for classification
+  model: "gemma:12b"
+
+# Scan settings
+scan_settings:
+  # File extension to scan for
+  file_extension: ".md"
+  # Directories to exclude from scanning
+  exclude_directories:
+    - ".obsidian"
+    - ".git"
+    - ".github"
+    - "node_modules"
+
+# Prompt configuration
+prompt_config:
+  # Prompt to use for classifying content quality
+  quality_classification_prompt: >
+    Review the following content and classify it into one of these categories:
+    1. 'Empty' - If the content is effectively empty or just contains basic scaffolding.
+    2. 'Low quality/low effort' - If the content is minimal, lacks detail, or appears hastily created.
+    3. 'Good enough' - If the content is reasonably detailed, well-structured, and provides useful information.
+    Respond with only one of these exact classifications.
+
+# Exclusion file configuration
+exclusion_file:
+  # Path to the file containing Obsidian links to exclude from scanning
+  # This should be relative to the target directory or an absolute path
+  path: "quality_exclude_links.md" 
