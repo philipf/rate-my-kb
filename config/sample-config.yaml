@@ -5,9 +5,10 @@ ai_engine:
   # URL of the AI API endpoint
   url: "http://localhost:11434/"
   # Model to use for classification
-  model: "gemma3:12b"
+  #model: "gemma3:12b"
   #model: "llama3.2:latest"
   #model: "gemma3:1b"
+  model: "deepseek-r1:14b"
 
 # Scan settings
 scan_settings:
@@ -18,7 +19,10 @@ scan_settings:
     - ".obsidian"
     - ".git"
     - ".github"
+    - "Attachments"
+    - "Daily notes"
     - "node_modules"
+    - "Excalidraw"
 
 # Prompt configuration
 prompt_config:
@@ -28,21 +32,24 @@ prompt_config:
 
     **Instructions:**
     1.  Review the main content of the note below deliminated by the '~~~~~' line. Ignore any frontmatter (like YAML blocks at the start).
-    2.  Choose **one** category that best describes the content's quality and substance:
+    2.  Don't try to interpret the content, just classify it.
+    3.  Choose **one** category that best describes the content's quality and substance:
         * 'Empty': The content section is effectively blank, contains only template text/scaffolding, or is missing after ignoring frontmatter.
         * 'Low quality': The content is present but extremely minimal, lacks detail or a clear point, or seems incomplete/placeholder.
-        * 'Good enough': The content provides a clear point, concept, or piece of information, even if brief. It has substance and is more than just a placeholder.
-        * 'Unreadable': The content is not readable, it is garbled or contains non-text characters.
-    3.  Respond **only** with a JSON object containing the classification
+        * 'Good enough': The content provides a clear point, concept, or piece of information, even if brief. It has substance and is camore than just a placeholder.
+        * 'Unreadable': The content is not readable, it is garbled or is encoded and not human readable.
+    4.  Respond **only** with a JSON object containing the classification
 
-    **Example Output Format:**
-    {
-      "classification": "Empty"
-    }
-
+    User content:
     ~~~~~
     {{ content }}
     ~~~~~
+
+    **Example Output Format, and nothing else:**
+    {
+      "classification": "Empty|Low quality|Good enough|Unreadable"
+    }
+
 
 # Exclusion file configuration
 exclusion_file:
