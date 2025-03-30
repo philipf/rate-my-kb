@@ -7,6 +7,7 @@ import (
 	"ratemykb/config"
 	"ratemykb/output"
 	"ratemykb/scanner"
+	"ratemykb/state"
 
 	"github.com/spf13/cobra"
 )
@@ -48,6 +49,12 @@ and generates a report in Markdown format.`,
 			fmt.Printf("LLM model: %s\n", cfg.AIEngine.Model)
 			fmt.Printf("LLM endpoint: %s\n", cfg.AIEngine.URL)
 
+			// Initialize state manager
+			stateManager, err := state.New(targetFolder)
+			if err != nil {
+				return fmt.Errorf("failed to initialize state manager: %w", err)
+			}
+
 			// Initialize scanner
 			fileScanner, err := scanner.New(cfg)
 			if err != nil {
@@ -68,11 +75,9 @@ and generates a report in Markdown format.`,
 				return fmt.Errorf("failed to initialize classifier: %w", err)
 			}
 
-			// Prepare results for output
-			var results []output.ResultFile
-
 			// Get total number of files to process
 			totalFiles := len(files)
+			totalAlreadyProcessed := 0
 			fmt.Printf("Processing %d files...\n", totalFiles)
 
 			// Helper function to show progress
@@ -84,6 +89,13 @@ and generates a report in Markdown format.`,
 
 			// Process each file
 			for i, file := range files {
+				// Check if file has already been processed
+				if stateManager.IsFileProcessed(file.Path) {
+					totalAlreadyProcessed++
+					showProgress(i, "Skipping (already processed)", file.Path)
+					continue
+				}
+
 				// Create a result file with default classification
 				result := output.ResultFile{
 					Path:           file.Path,
@@ -123,21 +135,22 @@ and generates a report in Markdown format.`,
 				} else if file.Status == scanner.StatusExcluded {
 					// Show progress for excluded files
 					showProgress(i, "Skipping", file.Path+" (Excluded)")
+					continue // Don't add excluded files to the report
 				}
 
-				// Add to results
-				results = append(results, result)
+				// Add processed file to state and update report
+				if err := stateManager.AddProcessedFile(result); err != nil {
+					fmt.Printf("Warning: Could not update report for %s: %v\n", file.Path, err)
+				}
 			}
 
-			fmt.Printf("Processing complete: %d/%d files processed (100%%)\n", totalFiles, totalFiles)
+			fmt.Printf("Processing complete: %d new files processed, %d already processed, %d total\n",
+				len(stateManager.GetProcessedFiles())-totalAlreadyProcessed,
+				totalAlreadyProcessed,
+				len(stateManager.GetProcessedFiles()))
 
-			// Generate the report
-			outputGenerator := output.New(targetFolder)
-			if err := outputGenerator.CreateReport(results); err != nil {
-				return fmt.Errorf("failed to generate report: %w", err)
-			}
-
-			fmt.Printf("Report generated successfully in %s/vault-quality-report.md\n", targetFolder)
+			// No need to generate a final report as it's been updated incrementally
+			fmt.Printf("Report available at %s/vault-quality-report.md\n", targetFolder)
 			return nil
 		},
 	}
@@ -155,4 +168,23 @@ func Execute() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
+}
+
+// ResetForTesting resets the CLI state for testing purposes
+// This is needed to avoid flag redefinition errors when running multiple tests
+func ResetForTesting() {
+	// Create a new root command
+	rootCmd = &cobra.Command{
+		Use:   "ratemykb",
+		Short: "Rate My Knowledge Base - Evaluate Markdown files quality",
+		Long: `Rate My Knowledge Base is a CLI tool that evaluates the quality of Markdown files
+in an Obsidian vault or any directory containing Markdown files.
+It classifies files as Empty, Low quality/low effort, or Good enough,
+and generates a report in Markdown format.`,
+		RunE: rootCmd.RunE,
+	}
+
+	// Add flags
+	rootCmd.PersistentFlags().StringVarP(&targetFolder, "target", "t", "", "Target folder containing Markdown files")
+	rootCmd.PersistentFlags().StringVarP(&configFile, "config", "c", "", "Path to configuration file")
 }

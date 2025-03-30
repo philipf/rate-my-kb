@@ -32,7 +32,7 @@ prompt_config:
     **Task:** Classify the provided markdown note content based on its substance.
 
     **Instructions:**
-    1.  Review the main content of the note below deliminated by the '~~~~~' line. Ignore any frontmatter (like YAML blocks at the start).
+    1.  Review the main content of the note below deliminated by the '~U~~~~' lines. Ignore any frontmatter (like YAML blocks at the start).
     2.  Don't try to interpret the content, just classify it.
     3.  Choose **one** category that best describes the content's quality and substance:
         * 'Empty': The content section is effectively blank, contains only template text/scaffolding, or is missing after ignoring frontmatter.
@@ -43,13 +43,13 @@ prompt_config:
     4.  Respond **only** with a JSON object containing the classification
 
     User content:
-    ~~~~~
+    ~U~~~~
     {{ content }}
-    ~~~~~
+    ~U~~~~
 
     **Example Output Format, and nothing else:**
     {
-      "classification": "Empty|Low quality|Good enough|Unreadable"
+      "classification": "Empty|Low quality|Good enough|High quality|Unreadable"
     }
 
 
