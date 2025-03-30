@@ -110,8 +110,11 @@ func TestCreateReport(t *testing.T) {
 	if !strings.Contains(contentStr, "## Files with Frontmatter Only") {
 		t.Error("report missing frontmatter-only files section")
 	}
-	if !strings.Contains(contentStr, "## Low Quality/Low Effort Files") {
+	if !strings.Contains(contentStr, "## Low quality Files") {
 		t.Error("report missing low quality files section")
+	}
+	if !strings.Contains(contentStr, "## Good enough Files") {
+		t.Error("report missing good enough files section")
 	}
 
 	// Check statistics
@@ -124,8 +127,11 @@ func TestCreateReport(t *testing.T) {
 	if !strings.Contains(contentStr, "Files with frontmatter only: 1") {
 		t.Error("report missing or incorrect frontmatter-only files count")
 	}
-	if !strings.Contains(contentStr, "Low quality/low effort files: 1") {
+	if !strings.Contains(contentStr, "Low quality files: 1") {
 		t.Error("report missing or incorrect low quality files count")
+	}
+	if !strings.Contains(contentStr, "Good enough files: 1") {
+		t.Error("report missing or incorrect good enough files count")
 	}
 
 	// Check file links
@@ -138,8 +144,8 @@ func TestCreateReport(t *testing.T) {
 	if !strings.Contains(contentStr, "[[low-quality]]") {
 		t.Error("report missing low quality file link")
 	}
-	if strings.Contains(contentStr, "[[good-enough]]") {
-		t.Error("report incorrectly includes good enough file")
+	if !strings.Contains(contentStr, "[[good-enough]]") {
+		t.Error("report missing good enough file link")
 	}
 }
 
@@ -172,8 +178,5 @@ func TestEmptySections(t *testing.T) {
 	}
 	if !strings.Contains(contentStr, "No files with frontmatter only found.") {
 		t.Error("report missing empty frontmatter-only files message")
-	}
-	if !strings.Contains(contentStr, "No low quality/low effort files found.") {
-		t.Error("report missing empty low quality files message")
 	}
 }

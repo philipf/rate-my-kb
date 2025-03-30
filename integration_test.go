@@ -58,15 +58,14 @@ func TestIntegration(t *testing.T) {
 
 	// Check that the report contains the expected sections
 	report := string(reportContent)
-	sections := []string{
+	baseSections := []string{
 		"# Vault Quality Report",
 		"## Statistics",
 		"## Empty Files",
 		"## Files with Frontmatter Only",
-		"## Low Quality/Low Effort Files",
 	}
 
-	for _, section := range sections {
+	for _, section := range baseSections {
 		if !strings.Contains(report, section) {
 			t.Errorf("Report missing section: %s", section)
 		}
@@ -180,10 +179,10 @@ func checkReportContains(t *testing.T, report, section, expectedText string) {
 
 	// Find the next section or end of file
 	nextSectionStart := len(report)
-	for _, s := range []string{"## Empty Files", "## Files with Frontmatter Only", "## Low Quality/Low Effort Files"} {
+	for _, s := range []string{"## Empty Files", "## Files with Frontmatter Only", "## "} {
 		if s != section {
 			idx := strings.Index(report[sectionStart:], s)
-			if idx != -1 {
+			if idx != -1 && sectionStart+idx > sectionStart {
 				idx += sectionStart
 				if idx < nextSectionStart {
 					nextSectionStart = idx
