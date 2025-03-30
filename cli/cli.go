@@ -3,7 +3,10 @@ package cli
 import (
 	"fmt"
 	"os"
+	"ratemykb/classification"
 	"ratemykb/config"
+	"ratemykb/output"
+	"ratemykb/scanner"
 
 	"github.com/spf13/cobra"
 )
@@ -41,11 +44,81 @@ and generates a report in Markdown format.`,
 				return fmt.Errorf("failed to load configuration: %w", err)
 			}
 
-			// Here we would continue with the scanning and classification process
-			// For now, just print a message with the loaded configuration
-			fmt.Printf("Successfully loaded configuration for target folder: %s\n", targetFolder)
-			fmt.Printf("AI Engine: %s, Model: %s\n", cfg.AIEngine.URL, cfg.AIEngine.Model)
+			// Print the configuration
+			fmt.Printf("Configuration: %+v\n", cfg)
 
+			// Initialize scanner
+			fileScanner, err := scanner.New(cfg)
+			if err != nil {
+				return fmt.Errorf("failed to initialize scanner: %w", err)
+			}
+
+			// Scan the target folder
+			fmt.Printf("Scanning %s for Markdown files...\n", targetFolder)
+			files, err := fileScanner.ScanDirectory(targetFolder)
+			if err != nil {
+				return fmt.Errorf("failed to scan directory: %w", err)
+			}
+			fmt.Printf("Found %d Markdown files\n", len(files))
+
+			// Initialize classifier
+			classifier, err := classification.New(cfg)
+			if err != nil {
+				return fmt.Errorf("failed to initialize classifier: %w", err)
+			}
+
+			// Prepare results for output
+			var results []output.ResultFile
+
+			// Process each file
+			for _, file := range files {
+				// Create a result file with default classification
+				result := output.ResultFile{
+					Path:           file.Path,
+					Status:         file.Status,
+					Classification: classification.ClassificationUnknown,
+				}
+
+				// Classify files that need review
+				if file.Status == scanner.StatusNeedsReview {
+					// Read the content of the file
+					content, err := scanner.ReadFileContent(file.Path)
+					if err != nil {
+						fmt.Printf("Warning: Could not read file %s: %v\n", file.Path, err)
+						continue
+					}
+
+					// Classify the content
+					fmt.Printf("Classifying %s...\n", file.Path)
+					result.Classification, err = classifier.ClassifyContent(content)
+
+					if err != nil {
+						fmt.Printf("Warning: Could not classify file %s: %v\n", file.Path, err)
+						continue
+					}
+
+					// Print the classification result
+					fmt.Printf("Classification result: %s\n", result.Classification)
+
+				} else if file.Status == scanner.StatusEmpty {
+					// Map scanner status to classification
+					result.Classification = classification.ClassificationEmpty
+				} else if file.Status == scanner.StatusFrontmatterOnly {
+					// Frontmatter-only files are considered low quality
+					result.Classification = classification.ClassificationLowQuality
+				}
+
+				// Add to results
+				results = append(results, result)
+			}
+
+			// Generate the report
+			outputGenerator := output.New(targetFolder)
+			if err := outputGenerator.CreateReport(results); err != nil {
+				return fmt.Errorf("failed to generate report: %w", err)
+			}
+
+			fmt.Printf("Report generated successfully in %s/vault-quality-report.md\n", targetFolder)
 			return nil
 		},
 	}

@@ -5,7 +5,8 @@ ai_engine:
   # URL of the AI API endpoint
   url: "http://localhost:11434/"
   # Model to use for classification
-  model: "gemma:12b"
+  #model: "gemma3:1b"
+  model: "llama3.1:8b"
 
 # Scan settings
 scan_settings:
@@ -22,11 +23,21 @@ scan_settings:
 prompt_config:
   # Prompt to use for classifying content quality
   quality_classification_prompt: >
-    Review the following content and classify it into one of these categories:
-    1. 'Empty' - If the content is effectively empty or just contains basic scaffolding.
-    2. 'Low quality/low effort' - If the content is minimal, lacks detail, or appears hastily created.
-    3. 'Good enough' - If the content is reasonably detailed, well-structured, and provides useful information.
-    Respond with only one of these exact classifications.
+    **Task:** Classify the provided markdown note content based on its substance.
+
+    **Instructions:**
+    1.  Review the main content of the note below. Ignore any frontmatter (like YAML blocks at the start).
+    2.  Choose **one** category that best describes the content's quality and substance:
+        * **'Empty'**: The content section is effectively blank, contains only template text/scaffolding, or is missing after ignoring frontmatter.
+        * **'Low quality'**: The content is present but extremely minimal, lacks detail or a clear point, or seems incomplete/placeholder.
+        * **'Good enough'**: The content provides a clear point, concept, or piece of information, even if brief. It has substance and is more than just a placeholder.
+    3.  Respond **only** with a JSON object containing the classification.
+
+    **Example Output Format:**
+    ```json
+    {
+      "classification": "Empty"
+    }
 
 # Exclusion file configuration
 exclusion_file:

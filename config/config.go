@@ -78,7 +78,7 @@ func LoadConfig(configPath string) (*Config, error) {
 func setDefaults(v *viper.Viper) {
 	// AI Engine defaults
 	v.SetDefault("ai_engine.url", "http://localhost:11434/")
-	v.SetDefault("ai_engine.model", "gemma:12b")
+	v.SetDefault("ai_engine.model", "gemma3:1b")
 
 	// Scan Settings defaults
 	v.SetDefault("scan_settings.file_extension", ".md")

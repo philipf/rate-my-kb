@@ -20,8 +20,8 @@ func TestLoadConfig(t *testing.T) {
 			t.Errorf("Expected default AIEngine.URL to be 'http://localhost:11434/', got %s", config.AIEngine.URL)
 		}
 
-		if config.AIEngine.Model != "gemma:12b" {
-			t.Errorf("Expected default AIEngine.Model to be 'gemma:12b', got %s", config.AIEngine.Model)
+		if config.AIEngine.Model != "gemma3:12b" {
+			t.Errorf("Expected default AIEngine.Model to be 'gemma3:1b', got %s", config.AIEngine.Model)
 		}
 
 		if config.ScanSettings.FileExtension != ".md" {
@@ -154,7 +154,7 @@ ai_engine:
 		invalidContent := `
 ai_engine:
   url: "http://localhost:11434/
-  model: gemma:12b
+  model: gemma3:1b
 this is not valid yaml
 `
 		err = os.WriteFile(tempFile.Name(), []byte(invalidContent), 0644)
@@ -177,8 +177,8 @@ func TestGetDefaultConfig(t *testing.T) {
 		t.Errorf("Expected default AIEngine.URL to be 'http://localhost:11434/', got %s", config.AIEngine.URL)
 	}
 
-	if config.AIEngine.Model != "gemma:12b" {
-		t.Errorf("Expected default AIEngine.Model to be 'gemma:12b', got %s", config.AIEngine.Model)
+	if config.AIEngine.Model != "gemma3:1b" {
+		t.Errorf("Expected default AIEngine.Model to be 'gemma3:1b', got %s", config.AIEngine.Model)
 	}
 
 	if config.ScanSettings.FileExtension != ".md" {

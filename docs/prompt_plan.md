@@ -112,7 +112,7 @@ Refer to todo.md and make sure thiss step has been validated.
 Develop the configuration module in the `config` package. Define a configuration struct that matches the following YAML structure:
 - ai_engine:
     - url (default: "http://localhost:11434/")
-    - model (default: "gemma:12b")
+    - model (default: "gemma3:1b")
 - scan_settings:
     - file_extension (set to ".md")
     - exclude_directories (a list of directories to ignore)
@@ -161,8 +161,8 @@ Refer to todo.md and make sure thiss step has been validated and update it  doc 
 ```text
 Implement the classification module in the `classification` package. This module should:
 1. Define a function that accepts file content and the GenAI prompt (from the configuration).
-2. Simulate sending this data to a GenAI engine (using LangChainGo) to classify the file as one of: "Empty", "Low quality/low effort", or "Good enough".
-3. Parse and return the classification result.
+2. Sending this data to a GenAI engine (using LangChainGo https://tmc.github.io/langchaingo/docs/getting-started/guide-ollama ) to classify the file as one of: "Empty", "Low quality/low effort", or "Good enough".
+3. Parse and return the classification result. See this example to base logic from https://raw.githubusercontent.com/tmc/langchaingo/refs/heads/main/examples/ollama-functions-example/ollama_functions_example.go
 
 Write unit tests that simulate different responses from the GenAI engine using mocking. End the prompt with the module exposing a function that can be called from the main workflow.
 
