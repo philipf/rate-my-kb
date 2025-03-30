@@ -112,6 +112,17 @@ func (c *Classifier) ClassifyContent(content string) (Classification, error) {
 
 		// Clean up the content if it contains markdown code blocks
 		content = strings.TrimSpace(content)
+
+		// Remove <think> XML tags section if present (for deepseek model)
+		if thinkStart := strings.Index(content, "<think>"); thinkStart != -1 {
+			if thinkEnd := strings.Index(content, "</think>"); thinkEnd != -1 {
+				beforeThink := content[:thinkStart]
+				afterThink := content[thinkEnd+8:] // 8 is the length of "</think>"
+				content = beforeThink + afterThink
+				content = strings.TrimSpace(content)
+			}
+		}
+
 		if strings.HasPrefix(content, "```") {
 			// Remove markdown code block formatting
 			content = strings.TrimPrefix(content, "```json")
