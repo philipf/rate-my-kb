@@ -8,7 +8,8 @@ ai_engine:
   #model: "gemma3:12b"
   #model: "llama3.2:latest"
   #model: "gemma3:1b"
-  model: "deepseek-r1:14b"
+  #model: "deepseek-r1:14b"
+  model: "deepseek-r1:8b"
 
 # Scan settings
 scan_settings:
@@ -36,7 +37,8 @@ prompt_config:
     3.  Choose **one** category that best describes the content's quality and substance:
         * 'Empty': The content section is effectively blank, contains only template text/scaffolding, or is missing after ignoring frontmatter.
         * 'Low quality': The content is present but extremely minimal, lacks detail or a clear point, or seems incomplete/placeholder.
-        * 'Good enough': The content provides a clear point, concept, or piece of information, even if brief. It has substance and is camore than just a placeholder.
+        * 'Good enough': The content provides a clear point, concept, or piece of information, even if brief. It has substance and is more than just a placeholder.
+        * 'High quality': The content is well written, has a clear point, and is a good note that should provide good value to the user.
         * 'Unreadable': The content is not readable, it is garbled or is encoded and not human readable.
     4.  Respond **only** with a JSON object containing the classification
 

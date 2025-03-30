@@ -116,6 +116,12 @@ func (c *Classifier) ClassifyContent(content string) (Classification, error) {
 		// Remove <think> XML tags section if present (for deepseek model)
 		if thinkStart := strings.Index(content, "<think>"); thinkStart != -1 {
 			if thinkEnd := strings.Index(content, "</think>"); thinkEnd != -1 {
+				// Extract thinking process
+				thinkContent := content[thinkStart+7 : thinkEnd] // 7 is the length of "<think>"
+				fmt.Println("Thinking process from model:")
+				fmt.Println(thinkContent)
+
+				// Remove the think section from response
 				beforeThink := content[:thinkStart]
 				afterThink := content[thinkEnd+8:] // 8 is the length of "</think>"
 				content = beforeThink + afterThink
