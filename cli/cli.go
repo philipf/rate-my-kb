@@ -71,8 +71,19 @@ and generates a report in Markdown format.`,
 			// Prepare results for output
 			var results []output.ResultFile
 
+			// Get total number of files to process
+			totalFiles := len(files)
+			fmt.Printf("Processing %d files...\n", totalFiles)
+
+			// Helper function to show progress
+			showProgress := func(i int, action, details string) {
+				filesProcessed := i + 1
+				percentComplete := float64(filesProcessed) / float64(totalFiles) * 100
+				fmt.Printf("[%d/%d - %.1f%%] %s %s\n", filesProcessed, totalFiles, percentComplete, action, details)
+			}
+
 			// Process each file
-			for _, file := range files {
+			for i, file := range files {
 				// Create a result file with default classification
 				result := output.ResultFile{
 					Path:           file.Path,
@@ -90,7 +101,7 @@ and generates a report in Markdown format.`,
 					}
 
 					// Classify the content
-					fmt.Printf("Classifying %s...\n", file.Path)
+					showProgress(i, "Classifying", file.Path)
 					result.Classification, err = classifier.ClassifyContent(content)
 
 					if err != nil {
@@ -104,14 +115,21 @@ and generates a report in Markdown format.`,
 				} else if file.Status == scanner.StatusEmpty {
 					// Map scanner status to classification
 					result.Classification = classification.Classification("Empty")
+					showProgress(i, "Skipping classification for", file.Path+" (Empty)")
 				} else if file.Status == scanner.StatusFrontmatterOnly {
 					// Frontmatter-only files are considered low quality
 					result.Classification = classification.Classification("Low quality")
+					showProgress(i, "Skipping classification for", file.Path+" (Frontmatter-only)")
+				} else if file.Status == scanner.StatusExcluded {
+					// Show progress for excluded files
+					showProgress(i, "Skipping", file.Path+" (Excluded)")
 				}
 
 				// Add to results
 				results = append(results, result)
 			}
+
+			fmt.Printf("Processing complete: %d/%d files processed (100%%)\n", totalFiles, totalFiles)
 
 			// Generate the report
 			outputGenerator := output.New(targetFolder)
