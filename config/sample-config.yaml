@@ -47,7 +47,7 @@ prompt_config:
     {{ content }}
     ~U~~~~
 
-    **Example Output Format, and nothing else:**
+    **Example JSON Output Format, don't include anything else to further describe your output the output will parsed by a computer program:**
     {
       "classification": "Empty|Low quality|Good enough|High quality|Unreadable"
     }

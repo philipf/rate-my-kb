@@ -137,16 +137,33 @@ func (c *Classifier) ClassifyContent(content string) (Classification, error) {
 			content = strings.TrimSpace(content)
 		}
 
+		// First try to parse the entire content as JSON
 		err := json.Unmarshal([]byte(content), &classificationResponse)
 		if err == nil && classificationResponse.Classification != "" {
 			// Successfully parsed JSON, use the classification
 			return Classification(classificationResponse.Classification), nil
 		} else {
-			// print the error
+			// If direct parsing fails, try to extract JSON between curly braces
+			startBrace := strings.Index(content, "{")
+			endBrace := strings.LastIndex(content, "}")
+			
+			if startBrace != -1 && endBrace != -1 && endBrace > startBrace {
+				// Extract the JSON part
+				jsonContent := content[startBrace : endBrace+1]
+				
+				// Try to parse the extracted JSON
+				err = json.Unmarshal([]byte(jsonContent), &classificationResponse)
+				if err == nil && classificationResponse.Classification != "" {
+					// Successfully parsed extracted JSON
+					return Classification(classificationResponse.Classification), nil
+				}
+			}
+			
+			// Log the error for debugging
 			fmt.Println("Error parsing JSON:", err)
 		}
 
-		// If not valid JSON or missing classification, use the raw content
+		// If all JSON parsing attempts fail, use the raw content
 		return Classification(strings.TrimSpace(content)), nil
 	}
 
