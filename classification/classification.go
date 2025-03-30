@@ -67,9 +67,8 @@ func (c *Classifier) ClassifyContent(content string) (Classification, error) {
 
 	ctx := context.Background()
 
-	// Create the prompt by combining the configuration prompt and the file content
-	prompt := fmt.Sprintf("%s\n\nHere is the content to review:\n%s",
-		c.config.PromptConfig.QualityClassificationPrompt, content)
+	// Create the prompt by replacing the template variable in the configuration prompt
+	prompt := strings.Replace(c.config.PromptConfig.QualityClassificationPrompt, "{{ content }}", content, 1)
 
 	// Call the LLM with function calling
 	resp, err := c.llm.GenerateContent(ctx,

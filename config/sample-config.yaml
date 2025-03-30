@@ -27,17 +27,22 @@ prompt_config:
     **Task:** Classify the provided markdown note content based on its substance.
 
     **Instructions:**
-    1.  Review the main content of the note below. Ignore any frontmatter (like YAML blocks at the start).
+    1.  Review the main content of the note below deliminated by the '~~~~~' line. Ignore any frontmatter (like YAML blocks at the start).
     2.  Choose **one** category that best describes the content's quality and substance:
-        * **'Empty'**: The content section is effectively blank, contains only template text/scaffolding, or is missing after ignoring frontmatter.
-        * **'Low quality'**: The content is present but extremely minimal, lacks detail or a clear point, or seems incomplete/placeholder.
-        * **'Good enough'**: The content provides a clear point, concept, or piece of information, even if brief. It has substance and is more than just a placeholder.
+        * 'Empty': The content section is effectively blank, contains only template text/scaffolding, or is missing after ignoring frontmatter.
+        * 'Low quality': The content is present but extremely minimal, lacks detail or a clear point, or seems incomplete/placeholder.
+        * 'Good enough': The content provides a clear point, concept, or piece of information, even if brief. It has substance and is more than just a placeholder.
+        * 'Unreadable': The content is not readable, it is garbled or contains non-text characters.
     3.  Respond **only** with a JSON object containing the classification
 
     **Example Output Format:**
     {
       "classification": "Empty"
     }
+
+    ~~~~~
+    {{ content }}
+    ~~~~~
 
 # Exclusion file configuration
 exclusion_file:
