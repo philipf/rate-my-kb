@@ -44,7 +44,7 @@ Create a `config.yaml` file to customize the behavior:
 ```yaml
 ai_engine:
   url: "http://localhost:11434/"  # Ollama server URL
-  model: "gemma3:1b"              # GenAI model to use
+  model: "deepseek-r1:8b"              # GenAI model to use
 
 scan_settings:
   file_extension: ".md"           # File extension to scan
@@ -98,6 +98,67 @@ go test -run TestIntegration
 - Go 1.18 or higher
 - Ollama server running locally (or accessible via network) for AI classification
 
+## Installing and Setting Up Ollama
+
+### Installation
+
+1. **Install Ollama**
+
+   Visit the [Ollama website](https://ollama.ai/download) to download and install Ollama for your platform.
+
+   **Linux**:
+   ```bash
+   curl -fsSL https://ollama.com/install.sh | sh
+   ```
+
+   **macOS**:
+   Download the .dmg file from the website and follow the installation instructions.
+
+   **Windows**:
+   Download the installer from the website and follow the installation steps.
+
+2. **Start Ollama Server**
+
+   After installation, start the Ollama server:
+
+   **Linux & macOS**:
+   ```bash
+   ollama serve
+   ```
+
+   **Windows**:
+   The server should start automatically after installation. If not, launch it from the Start menu.
+
+3. **Pull the DeepSeek Model**
+
+   Open a new terminal window and pull the DeepSeek model:
+
+   ```bash
+   ollama pull deepseek-r1:8b
+   ```
+
+   This might take some time depending on your internet connection as it downloads the model (approximately 4-5GB).
+
+4. **Verify Installation**
+
+   Test that the model is working correctly:
+
+   ```bash
+   ollama run deepseek-r1:8b "Hello, how are you today?"
+   ```
+
+### Configuration for Rate My KB
+
+Make sure your `config.yaml` file points to your Ollama server:
+
+```yaml
+ai_engine:
+  url: "http://localhost:11434/"  # Default Ollama server URL
+  model: "deepseek-r1:8b"         # The model we just pulled
+```
+
+If you're running Ollama on a different machine or port, adjust the URL accordingly.
+
 ## License
 
-MIT 
+MIT

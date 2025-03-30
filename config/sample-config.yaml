@@ -8,8 +8,8 @@ ai_engine:
   #model: "gemma3:12b"
   #model: "llama3.2:latest"
   #model: "gemma3:1b"
-  #model: "deepseek-r1:14b"
-  model: "deepseek-r1:8b"
+  model: "deepseek-r1:14b"
+  #model: "deepseek-r1:8b"
 
 # Scan settings
 scan_settings:
