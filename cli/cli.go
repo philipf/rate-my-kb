@@ -44,8 +44,9 @@ and generates a report in Markdown format.`,
 				return fmt.Errorf("failed to load configuration: %w", err)
 			}
 
-			// Print the configuration
-			fmt.Printf("Configuration: %+v\n", cfg)
+			// Print the LLM model and endpoint
+			fmt.Printf("LLM model: %s\n", cfg.AIEngine.Model)
+			fmt.Printf("LLM endpoint: %s\n", cfg.AIEngine.URL)
 
 			// Initialize scanner
 			fileScanner, err := scanner.New(cfg)
@@ -76,7 +77,7 @@ and generates a report in Markdown format.`,
 				result := output.ResultFile{
 					Path:           file.Path,
 					Status:         file.Status,
-					Classification: classification.ClassificationUnknown,
+					Classification: classification.Classification("Unknown"),
 				}
 
 				// Classify files that need review
@@ -102,10 +103,10 @@ and generates a report in Markdown format.`,
 
 				} else if file.Status == scanner.StatusEmpty {
 					// Map scanner status to classification
-					result.Classification = classification.ClassificationEmpty
+					result.Classification = classification.Classification("Empty")
 				} else if file.Status == scanner.StatusFrontmatterOnly {
 					// Frontmatter-only files are considered low quality
-					result.Classification = classification.ClassificationLowQuality
+					result.Classification = classification.Classification("Low quality")
 				}
 
 				// Add to results

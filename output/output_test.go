@@ -69,12 +69,12 @@ func TestCreateReport(t *testing.T) {
 		{
 			Path:           filepath.Join(tempDir, "low-quality.md"),
 			Status:         scanner.StatusNeedsReview,
-			Classification: classification.ClassificationLowQuality,
+			Classification: classification.Classification("Low quality"),
 		},
 		{
 			Path:           filepath.Join(tempDir, "good-enough.md"),
 			Status:         scanner.StatusNeedsReview,
-			Classification: classification.ClassificationGoodEnough,
+			Classification: classification.Classification("Good enough"),
 		},
 	}
 

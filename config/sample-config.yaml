@@ -5,8 +5,9 @@ ai_engine:
   # URL of the AI API endpoint
   url: "http://localhost:11434/"
   # Model to use for classification
+  model: "gemma3:12b"
+  #model: "llama3.2:latest"
   #model: "gemma3:1b"
-  model: "llama3.1:8b"
 
 # Scan settings
 scan_settings:
@@ -31,10 +32,9 @@ prompt_config:
         * **'Empty'**: The content section is effectively blank, contains only template text/scaffolding, or is missing after ignoring frontmatter.
         * **'Low quality'**: The content is present but extremely minimal, lacks detail or a clear point, or seems incomplete/placeholder.
         * **'Good enough'**: The content provides a clear point, concept, or piece of information, even if brief. It has substance and is more than just a placeholder.
-    3.  Respond **only** with a JSON object containing the classification.
+    3.  Respond **only** with a JSON object containing the classification
 
     **Example Output Format:**
-    ```json
     {
       "classification": "Empty"
     }

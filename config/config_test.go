@@ -20,7 +20,7 @@ func TestLoadConfig(t *testing.T) {
 			t.Errorf("Expected default AIEngine.URL to be 'http://localhost:11434/', got %s", config.AIEngine.URL)
 		}
 
-		if config.AIEngine.Model != "gemma3:12b" {
+		if config.AIEngine.Model != "gemma3:1b" {
 			t.Errorf("Expected default AIEngine.Model to be 'gemma3:1b', got %s", config.AIEngine.Model)
 		}
 

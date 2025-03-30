@@ -18,20 +18,6 @@ import (
 // Classification represents the quality classification of a file
 type Classification string
 
-const (
-	// ClassificationEmpty indicates the file is effectively empty
-	ClassificationEmpty Classification = "Empty"
-
-	// ClassificationLowQuality indicates the file is of low quality or low effort
-	ClassificationLowQuality Classification = "Low quality/low effort"
-
-	// ClassificationGoodEnough indicates the file has good enough content
-	ClassificationGoodEnough Classification = "Good enough"
-
-	// ClassificationUnknown indicates the classification could not be determined
-	ClassificationUnknown Classification = "Unknown"
-)
-
 // Classifier handles the quality classification of files using a GenAI engine
 type Classifier struct {
 	config *config.Config
@@ -67,11 +53,11 @@ func New(cfg *config.Config) (*Classifier, error) {
 }
 
 // ClassifyContent classifies the content of a file using the GenAI engine
-// It returns the classification as one of: Empty, Low quality/low effort, or Good enough
+// It returns the classification as provided by the LLM
 func (c *Classifier) ClassifyContent(content string) (Classification, error) {
 	// Early checks for empty content
 	if strings.TrimSpace(content) == "" {
-		return ClassificationEmpty, nil
+		return Classification("Empty"), nil
 	}
 
 	// If this is a mock classifier (used in tests), return the mock classification directly
@@ -93,14 +79,13 @@ func (c *Classifier) ClassifyContent(content string) (Classification, error) {
 		llms.WithFunctions(classificationFunctions),
 	)
 	if err != nil {
-		return ClassificationUnknown, fmt.Errorf("error calling GenAI engine: %w", err)
+		return Classification("Unknown"), fmt.Errorf("error calling GenAI engine: %w", err)
 	}
 
 	// Check if we have a function call response
 	if len(resp.Choices) > 0 && resp.Choices[0].FuncCall != nil {
-
 		// print the function call response
-		fmt.Println("Function call response:", resp.Choices[0].FuncCall.Arguments)
+		// fmt.Println("Function call response:", resp.Choices[0].FuncCall.Arguments)
 
 		var classificationResponse struct {
 			Classification string `json:"classification"`
@@ -108,20 +93,48 @@ func (c *Classifier) ClassifyContent(content string) (Classification, error) {
 
 		err = json.Unmarshal([]byte(resp.Choices[0].FuncCall.Arguments), &classificationResponse)
 		if err != nil {
-			return ClassificationUnknown, fmt.Errorf("error parsing function call response: %w", err)
+			return Classification("Unknown"), fmt.Errorf("error parsing function call response: %w", err)
 		}
 
-		return parseClassification(classificationResponse.Classification)
+		// Use the classification directly from the LLM
+		if classificationResponse.Classification != "" {
+			return Classification(classificationResponse.Classification), nil
+		}
 	}
 
 	// If no function call, try to parse from the content directly
 	if len(resp.Choices) > 0 && resp.Choices[0].Content != "" {
-		// print the content response
-		fmt.Println("Content response:", resp.Choices[0].Content)
-		return parseClassification(resp.Choices[0].Content)
+		// Try to parse the content as JSON
+		var classificationResponse struct {
+			Classification string `json:"classification"`
+		}
+
+		content := resp.Choices[0].Content
+
+		// Clean up the content if it contains markdown code blocks
+		content = strings.TrimSpace(content)
+		if strings.HasPrefix(content, "```") {
+			// Remove markdown code block formatting
+			content = strings.TrimPrefix(content, "```json")
+			content = strings.TrimPrefix(content, "```")
+			content = strings.TrimSuffix(content, "```")
+			content = strings.TrimSpace(content)
+		}
+
+		err := json.Unmarshal([]byte(content), &classificationResponse)
+		if err == nil && classificationResponse.Classification != "" {
+			// Successfully parsed JSON, use the classification
+			return Classification(classificationResponse.Classification), nil
+		} else {
+			// print the error
+			fmt.Println("Error parsing JSON:", err)
+		}
+
+		// If not valid JSON or missing classification, use the raw content
+		return Classification(strings.TrimSpace(content)), nil
 	}
 
-	return ClassificationUnknown, errors.New("no valid response from GenAI engine")
+	return Classification("Unknown"), errors.New("no valid response from GenAI engine")
 }
 
 // Define the classification function for the LLM
@@ -134,40 +147,12 @@ var classificationFunctions = []llms.FunctionDefinition{
 			Properties: map[string]jsonschema.Definition{
 				"classification": {
 					Type:        jsonschema.String,
-					Description: "The classification of the content, which must be exactly one of: 'Empty', 'Low quality/low effort', or 'Good enough'",
-					Enum: []string{
-						string(ClassificationEmpty),
-						string(ClassificationLowQuality),
-						string(ClassificationGoodEnough),
-					},
+					Description: "The classification of the content describing its quality",
 				},
 			},
 			Required: []string{"classification"},
 		},
 	},
-}
-
-// parseClassification extracts a classification from the GenAI response
-func parseClassification(response string) (Classification, error) {
-	// Convert to lowercase and trim spaces for consistent matching
-	normalized := strings.ToLower(strings.TrimSpace(response))
-
-	if strings.Contains(normalized, "empty") {
-		return ClassificationEmpty, nil
-	}
-
-	if strings.Contains(normalized, "low quality") || strings.Contains(normalized, "low effort") {
-		return ClassificationLowQuality, nil
-	}
-
-	if strings.Contains(normalized, "good enough") {
-		return ClassificationGoodEnough, nil
-	}
-
-	// debug
-	fmt.Println("Classification:", normalized)
-	// If we can't determine a classification, return an error
-	return ClassificationUnknown, errors.New("could not determine classification from response")
 }
 
 // NewMockClassifier creates a classifier that always returns a predefined classification
@@ -215,7 +200,7 @@ func (m *testLLM) Call(ctx context.Context, prompt string, options ...llms.CallO
 	// Extract content from the prompt
 	contentIndex := strings.Index(prompt, "Here is the content to review:")
 	if contentIndex == -1 {
-		return string(ClassificationUnknown), nil
+		return string(Classification("Unknown")), nil
 	}
 
 	content := prompt[contentIndex+len("Here is the content to review:"):]
@@ -223,14 +208,14 @@ func (m *testLLM) Call(ctx context.Context, prompt string, options ...llms.CallO
 	// Simple classification logic for tests
 	content = strings.TrimSpace(content)
 	if content == "" {
-		return string(ClassificationEmpty), nil
+		return string(Classification("Empty")), nil
 	}
 
 	if len(content) < 100 || strings.Contains(content, "TODO") {
-		return string(ClassificationLowQuality), nil
+		return string(Classification("Low quality")), nil
 	}
 
-	return string(ClassificationGoodEnough), nil
+	return string(Classification("Good enough")), nil
 }
 
 // GenerateContent implements the llms.Model interface for testing
@@ -250,7 +235,7 @@ func (m *testLLM) GenerateContent(ctx context.Context, messages []llms.MessageCo
 	// Extract content from the prompt
 	contentIndex := strings.Index(prompt, "Here is the content to review:")
 	if contentIndex == -1 {
-		return simpleResponse(ClassificationUnknown), nil
+		return simpleResponse(Classification("Unknown")), nil
 	}
 
 	content := prompt[contentIndex+len("Here is the content to review:"):]
@@ -258,14 +243,14 @@ func (m *testLLM) GenerateContent(ctx context.Context, messages []llms.MessageCo
 	// Simple classification logic for tests
 	content = strings.TrimSpace(content)
 	if content == "" {
-		return simpleResponse(ClassificationEmpty), nil
+		return simpleResponse(Classification("Empty")), nil
 	}
 
 	if len(content) < 100 || strings.Contains(content, "TODO") {
-		return simpleResponse(ClassificationLowQuality), nil
+		return simpleResponse(Classification("Low quality")), nil
 	}
 
-	return simpleResponse(ClassificationGoodEnough), nil
+	return simpleResponse(Classification("Good enough")), nil
 }
 
 // simpleResponse creates a ContentResponse with both regular content and function call

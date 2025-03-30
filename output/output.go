@@ -34,15 +34,20 @@ func New(targetFolder string) *Generator {
 // and writes it to a file in the target folder
 func (g *Generator) CreateReport(files []ResultFile) error {
 	// Categorize files
-	var emptyFiles, frontmatterOnlyFiles, lowQualityFiles []ResultFile
+	var emptyFiles, frontmatterOnlyFiles []ResultFile
+
+	// Map to store files by classification
+	classificationMap := make(map[string][]ResultFile)
 
 	for _, file := range files {
 		if file.Status == scanner.StatusEmpty {
 			emptyFiles = append(emptyFiles, file)
 		} else if file.Status == scanner.StatusFrontmatterOnly {
 			frontmatterOnlyFiles = append(frontmatterOnlyFiles, file)
-		} else if file.Classification == classification.ClassificationLowQuality {
-			lowQualityFiles = append(lowQualityFiles, file)
+		} else if file.Classification != "" {
+			// Group files by their classification
+			classStr := string(file.Classification)
+			classificationMap[classStr] = append(classificationMap[classStr], file)
 		}
 	}
 
@@ -59,7 +64,12 @@ func (g *Generator) CreateReport(files []ResultFile) error {
 	content.WriteString(fmt.Sprintf("- Total files scanned: %d\n", len(files)))
 	content.WriteString(fmt.Sprintf("- Empty files: %d\n", len(emptyFiles)))
 	content.WriteString(fmt.Sprintf("- Files with frontmatter only: %d\n", len(frontmatterOnlyFiles)))
-	content.WriteString(fmt.Sprintf("- Low quality/low effort files: %d\n\n", len(lowQualityFiles)))
+
+	// Add statistics for each classification type
+	for classType, classFiles := range classificationMap {
+		content.WriteString(fmt.Sprintf("- %s files: %d\n", classType, len(classFiles)))
+	}
+	content.WriteString("\n")
 
 	// Add empty files section
 	content.WriteString("## Empty Files\n\n")
@@ -85,16 +95,18 @@ func (g *Generator) CreateReport(files []ResultFile) error {
 		content.WriteString("\n")
 	}
 
-	// Add low quality files section
-	content.WriteString("## Low Quality/Low Effort Files\n\n")
-	if len(lowQualityFiles) == 0 {
-		content.WriteString("No low quality/low effort files found.\n\n")
-	} else {
-		for _, file := range lowQualityFiles {
-			link := g.formatObsidianLink(file.Path)
-			content.WriteString(fmt.Sprintf("- %s\n", link))
+	// Add sections for each classification type
+	for classType, classFiles := range classificationMap {
+		content.WriteString(fmt.Sprintf("## %s Files\n\n", classType))
+		if len(classFiles) == 0 {
+			content.WriteString(fmt.Sprintf("No %s files found.\n\n", strings.ToLower(classType)))
+		} else {
+			for _, file := range classFiles {
+				link := g.formatObsidianLink(file.Path)
+				content.WriteString(fmt.Sprintf("- %s\n", link))
+			}
+			content.WriteString("\n")
 		}
-		content.WriteString("\n")
 	}
 
 	// Write report to file
