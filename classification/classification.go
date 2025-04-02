@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"ratemykb/config"
+	"regexp"
 	"strings"
 
 	"github.com/tmc/langchaingo/jsonschema"
@@ -129,12 +130,11 @@ func (c *Classifier) ClassifyContent(content string) (Classification, error) {
 			}
 		}
 
-		if strings.HasPrefix(content, "```") {
-			// Remove markdown code block formatting
-			content = strings.TrimPrefix(content, "```json")
-			content = strings.TrimPrefix(content, "```")
-			content = strings.TrimSuffix(content, "```")
-			content = strings.TrimSpace(content)
+		// Remove markdown code block formatting with regex
+		mdCodeBlockRegex := regexp.MustCompile("```(?:json)?\\s*([\\s\\S]*?)```")
+		if matches := mdCodeBlockRegex.FindStringSubmatch(content); len(matches) > 1 {
+			// Use the content inside the code block
+			content = strings.TrimSpace(matches[1])
 		}
 
 		// First try to parse the entire content as JSON
@@ -142,26 +142,19 @@ func (c *Classifier) ClassifyContent(content string) (Classification, error) {
 		if err == nil && classificationResponse.Classification != "" {
 			// Successfully parsed JSON, use the classification
 			return Classification(classificationResponse.Classification), nil
-		} else {
-			// If direct parsing fails, try to extract JSON between curly braces
-			startBrace := strings.Index(content, "{")
-			endBrace := strings.LastIndex(content, "}")
-			
-			if startBrace != -1 && endBrace != -1 && endBrace > startBrace {
-				// Extract the JSON part
-				jsonContent := content[startBrace : endBrace+1]
-				
-				// Try to parse the extracted JSON
-				err = json.Unmarshal([]byte(jsonContent), &classificationResponse)
-				if err == nil && classificationResponse.Classification != "" {
-					// Successfully parsed extracted JSON
-					return Classification(classificationResponse.Classification), nil
-				}
-			}
-			
-			// Log the error for debugging
-			fmt.Println("Error parsing JSON:", err)
 		}
+
+		// If direct parsing fails, try to extract JSON between curly braces using regex
+		jsonRegex := regexp.MustCompile(`(?s)\{.*"classification"\s*:\s*"[^"]*".*\}`)
+		if jsonMatch := jsonRegex.FindString(content); jsonMatch != "" {
+			err = json.Unmarshal([]byte(jsonMatch), &classificationResponse)
+			if err == nil && classificationResponse.Classification != "" {
+				return Classification(classificationResponse.Classification), nil
+			}
+		}
+			
+		// Log the error for debugging
+		fmt.Println("Error parsing JSON or no valid JSON found in response:", content)
 
 		// If all JSON parsing attempts fail, use the raw content
 		return Classification(strings.TrimSpace(content)), nil
